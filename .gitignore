@@ -1,0 +1,31 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.venv/
+
+# YOLO & PyTorch Model Weights
+*.pt
+*.onnx
+*.weights
+*.engine
+
+# Datasets and Images (Keep these local or on Google Drive!)
+data/
+datasets/
+*.mp4
+*.jpg
+*.jpeg
+*.png
+
+# YOLO Training Outputs (These get heavy fast)
+runs/
+yolov8n.pt
+
+# OS generated files
+.DS_Store
+Thumbs.db
