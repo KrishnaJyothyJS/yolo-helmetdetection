@@ -46,3 +46,47 @@ yolo-helmet-detection/
 ├── .gitignore                 # Protects repo from large dataset/model uploads
 ├── requirements.txt           # Project dependencies
 └── README.md                  # Project documentation
+
+
+## **⚙️ Setup & Installation**
+
+1. Clone the repository
+'''bash 
+git clone https://github.com/YOUR_GITHUB_USERNAME/yolo-helmetdetection.git
+cd yolo-helmetdetection
+
+2. Create and activate a virtual environment (Windows)
+python -m venv venv
+.\venv\Scripts\activate
+
+3. Install the dependencies
+pip install -r requirements.txt
+
+
+**💻 Usage Instructions**
+
+1. Live Webcam Demo (Real-Time Detection)
+To run the real-time detection system using your connected webcam:
+python src/detect_live.py
+  (Note: Press q while the video window is active to exit the stream.)
+
+2. Testing Images & Videos (Offline Media)
+To test the model against specific edge cases, images, or street footage:
+python src/test_media.py
+  (The script will prompt you for the file path (e.g., test_assets/video.mp4). Once finished, it will automatically open the media_test folder to show you the annotated results with custom bounding boxes.)
+
+Training the Model
+To train the model:
+python src/train.py
+
+
+**🧠 Model Details**
+Our system uses YOLOv8, one of the world's fastest and most accurate AI models for "seeing" objects in real-time.
+
+Custom Training: We didn't just use a generic model. We specifically trained this AI to distinguish between people wearing helmets and those who aren't.
+
+Three-Way Recognition: The model is smart enough to identify three distinct things: Helmets, No-Helmets, and the Person involved.
+
+Real-Time Speed: It is optimized to process video instantly. This means it can detect safety violations on a live camera feed without any lag.
+
+
