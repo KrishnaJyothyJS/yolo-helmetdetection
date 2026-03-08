@@ -1,82 +1,62 @@
-import cv2
 import os
+import subprocess
+import platform
 from ultralytics import YOLO
 
-def process_frame(frame, model):
-    """Applies YOLO detection and custom coloring to a single frame."""
-    results = model(frame, conf=0.5)  # Setting confidence to 50%
-    
-    for r in results:
-        for box in r.boxes:
-            # Get coordinates and class info
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
-            cls = int(box.cls[0])
-            conf = round(float(box.conf[0]) * 100, 1)
-            class_name = model.names[cls]
-
-            # Custom Color Logic
-            if class_name == "Helmet":
-                color = (0, 255, 0)      # Green
-            elif class_name == "No-Helmet":
-                color = (0, 0, 255)      # Red
-            else:
-                color = (255, 0, 0)      # Blue (Person)
-
-            # Draw Box
-            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 3)
-            
-            # Draw Label
-            label = f'{class_name} {conf}%'
-            t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
-            cv2.rectangle(frame, (x1, y1 - t_size[1] - 10), (x1 + t_size[0], y1), color, -1)
-            cv2.putText(frame, label, (x1, y1 - 7), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    return frame
+def open_folder(path):
+    """Automatically opens the folder in File Explorer based on the OS."""
+    if platform.system() == "Windows":
+        os.startfile(path)
+    elif platform.system() == "Darwin":  # macOS
+        subprocess.Popen(["open", path])
+    else:  # Linux
+        subprocess.Popen(["xdg-open", path])
 
 def main():
-    # Load your custom model
+    # 1. Path to your custom-trained 'brain'
     model_path = 'runs/detect/helmet_yolo_model/weights/best.pt'
-    if not os.path.exists(model_path):
-        print("Error: best.pt not found! Use yolov8n.pt for testing.")
-        model = YOLO('yolov8n.pt')
-    else:
-        model = YOLO(model_path)
-
-    path = input("Enter path to image or video (e.g., test_assets/test.jpg): ").strip()
     
-    if not os.path.exists(path):
-        print("File not found!")
+    if not os.path.exists(model_path):
+        print(f"Error: Custom model not found at {model_path}")
+        print("Make sure your teammate has finished training and the file is in the right place!")
         return
 
-    # Check if file is an image or video
-    extension = os.path.splitext(path)[1].lower()
-    
-    if extension in ['.jpg', '.jpeg', '.png']:
-        # IMAGE MODE
-        image = cv2.imread(path)
-        processed_image = process_frame(image, model)
-        cv2.imshow('Image Detection Test', processed_image)
-        print("Press any key to close the image.")
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+    # 2. Load the model
+    model = YOLO(model_path)
 
-    elif extension in ['.mp4', '.avi', '.mov']:
-        # VIDEO MODE
-        cap = cv2.VideoCapture(path)
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                break
-            
-            processed_frame = process_frame(frame, model)
-            cv2.imshow('Video Detection Test', processed_frame)
-            
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        cap.release()
-        cv2.destroyAllWindows()
-    else:
-        print("Unsupported file format!")
+    # 3. Get the input file path from the user
+    print("\n--- YOLO Helmet Detection Media Tester ---")
+    source_path = input("Enter the path to your image or video (e.g., test_assets/test.mp4): ").strip()
+    
+    if not os.path.exists(source_path):
+        print(f"Error: The file '{source_path}' does not exist.")
+        return
+
+    # 4. Run Inference and Save Results
+    # project='media_test' creates the main folder
+    # name='detections' creates the sub-folder
+    # exist_ok=True prevents it from creating 'detections2', 'detections3', etc.
+    print(f"\nProcessing: {os.path.basename(source_path)}...")
+    
+    results = model.predict(
+        source=source_path,
+        save=True,           # Saves the file with boxes and labels
+        project='media_test', 
+        name='detections',    
+        exist_ok=True,       
+        conf=0.5,            # Only show boxes with >50% confidence
+        line_width=2         # Adjusts thickness of the bounding box
+    )
+
+    # 5. Final Output
+    output_dir = os.path.join('media_test', 'detections')
+    print("\n" + "="*40)
+    print(f"SUCCESS! Processed file is in: {output_dir}")
+    print("Opening the results folder now...")
+    print("="*40)
+
+    # Automatically open the folder for the demo
+    open_folder(os.path.abspath(output_dir))
 
 if __name__ == "__main__":
     main()
