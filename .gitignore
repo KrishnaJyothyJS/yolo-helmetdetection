@@ -14,7 +14,7 @@ env/
 *.weights
 *.engine
 
-# Datasets and Images (Keep these local or on Google Drive!)
+# Datasets and Images 
 data/
 datasets/
 *.mp4
@@ -29,3 +29,6 @@ yolov8n.pt
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Testing Media 
+test_assets/
