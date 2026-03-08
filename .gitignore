@@ -32,3 +32,6 @@ Thumbs.db
 
 # Testing Media 
 test_assets/
+
+# media_test
+media_test/
