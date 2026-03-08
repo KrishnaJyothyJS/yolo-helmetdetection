@@ -14,7 +14,7 @@ def test_media(source_path):
 
 if __name__ == "__main__":
     # Change this to the path of the file you want to test!
-    # Example: 'test_assets/biker_video.mp4' or 'test_assets/group_photo.jpg'
+    # Ex 'test_assets/biker_video.mp4' 
     path_to_test = input("Enter the path to your image or video file: ")
     
     if os.path.exists(path_to_test):
