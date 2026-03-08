@@ -2,25 +2,25 @@ import torch
 from ultralytics import YOLO
 
 def main():
-    # 1. Automatically detect if a GPU is available
     device = '0' if torch.cuda.is_available() else 'cpu'
-    print(f"Starting training on device: {device}")
+    print(f"Resuming training on device: {device}")
 
-    # 2. Load the base YOLOv8 Nano model
-    model = YOLO('yolov8n.pt')
+    # 1. Point to the 'last.pt' checkpoint instead of the base model
+    # This allows the model to pick up right where it crashed!
+    model = YOLO('runs/detect/helmet_yolo_model/weights/last.pt')
 
-    # 3. Train the model on your custom dataset
-    # Make sure the path to data.yaml is correct relative to where you run the script!
     results = model.train(
-        data='datasets/data.yaml',  
-        epochs=30,                  # Number of times the model will look at the entire dataset
-        imgsz=640,                  # Standard image size for YOLO
-        batch=16,                   # Number of images processed at once
-        device=device,              # Automatically uses GPU if available
-        name='helmet_yolo_model'    # Name of the folder where results are saved
+        data='datasets/data.yaml',
+        epochs=30,
+        imgsz=640,
+        batch=8,           # Reduced slightly to be safe with GPU memory
+        device=device,
+        workers=0,         # CRITICAL: Fixes the 'resource already mapped' error on Windows
+        pin_memory=False,  # CRITICAL: Fixes the memory thread crash
+        resume=True,       
+        name='helmet_yolo_model',
+        exist_ok=True      # Overwrites the existing folder instead of creating a new one
     )
-
-    print("Training complete! Check the 'runs/detect/helmet_yolo_model' folder for your best weights.")
 
 if __name__ == '__main__':
     main()
